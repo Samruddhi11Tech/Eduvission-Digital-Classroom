@@ -1,0 +1,350 @@
+{
+  "users": [
+    {
+      "id": "teacher-demo",
+      "name": "Demo Teacher",
+      "email": "teacher@eduvision.local",
+      "passwordHash": "$2y$12$kqeJIVFvGcgwI/8LHsTaUeduNPZ16/sqDkjI4TofqZWzkT8zqoseK",
+      "role": "teacher"
+    },
+    {
+      "id": "student-demo",
+      "name": "Demo Student",
+      "email": "student@eduvision.local",
+      "passwordHash": "$2y$12$WKoKicbVe6JxbmCfTSdAxOoJl/kidi1LNEwNrRbSHkkDNXQqGutaC",
+      "role": "student"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "math",
+      "name": "Mathematics",
+      "emoji": "🧮",
+      "description": "Understand numbers, patterns and problem solving visually.",
+      "color": "pink"
+    },
+    {
+      "id": "science",
+      "name": "Science",
+      "emoji": "🔬",
+      "description": "Explore the world through experiments, models and stories.",
+      "color": "blue"
+    },
+    {
+      "id": "english",
+      "name": "English",
+      "emoji": "📚",
+      "description": "Build communication, grammar, vocabulary and confidence.",
+      "color": "yellow"
+    },
+    {
+      "id": "social",
+      "name": "Social Science",
+      "emoji": "🌍",
+      "description": "Discover history, geography, civics and our society.",
+      "color": "green"
+    },
+    {
+      "id": "hindi",
+      "name": "Hindi",
+      "emoji": "🪷",
+      "description": "Learn language and literature through engaging activities.",
+      "color": "purple"
+    },
+    {
+      "id": "marathi",
+      "name": "Marathi",
+      "emoji": "🌺",
+      "description": "Learn Marathi language and literature in a friendly way.",
+      "color": "orange"
+    },
+    {
+      "id": "computer",
+      "name": "Computer Science",
+      "emoji": "💻",
+      "description": "Build digital skills, logic and computational thinking.",
+      "color": "cyan"
+    },
+    {
+      "id": "subject-1790100132471-wl45jm",
+      "name": "philosophy",
+      "emoji": "📚",
+      "description": "the philo means wisdom and philosophy means the knowledge of wisdom",
+      "color": "purple"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "science-light",
+      "subjectId": "science",
+      "title": "Light Around Us",
+      "description": "Reflection, shadows and how we see objects.",
+      "published": true
+    },
+    {
+      "id": "math-fractions",
+      "subjectId": "math",
+      "title": "Fractions Made Visual",
+      "description": "Understand fractions using everyday objects and pictures.",
+      "published": true
+    },
+    {
+      "id": "computer-ai",
+      "subjectId": "computer",
+      "title": "Introduction to Artificial Intelligence",
+      "description": "A friendly introduction to AI and how machines learn patterns.",
+      "published": true
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat-light-1",
+      "chapterId": "science-light",
+      "title": "Reflection of Light — Notes",
+      "type": "note",
+      "description": "Read the core ideas before attempting the quiz.",
+      "content": "Light can change direction when it strikes a surface. This change in direction is called reflection. A smooth surface can produce a clear reflection.",
+      "url": "",
+      "createdBy": "teacher-demo",
+      "createdAt": "2026-09-01T10:00:00.000Z",
+      "published": true
+    },
+    {
+      "id": "mat-light-2",
+      "chapterId": "science-light",
+      "title": "Watch a visual explanation",
+      "type": "video",
+      "description": "Paste a trusted educational video link from the teacher dashboard.",
+      "content": "",
+      "url": "https://www.youtube.com/watch?v=example",
+      "createdBy": "teacher-demo",
+      "createdAt": "2026-09-01T10:05:00.000Z",
+      "published": true
+    },
+    {
+      "id": "material-1790101202643-3hykp6",
+      "chapterId": "computer-ai",
+      "title": "basic of python",
+      "type": "video",
+      "description": "A beginner friendly python learning playlist",
+      "content": "A beginner friendly python learning playlist",
+      "url": "https://youtube.com/playlist?list=PLKnIA16_Rmvb1RYR-iTA_hzckhdONtSW4&si=iFUVwQ-i9arYMjEz",
+      "createdBy": "teacher-demo",
+      "createdAt": "2026-09-22T18:20:02.643Z",
+      "published": true
+    },
+    {
+      "id": "material-1790143078952-v6uvv4",
+      "chapterId": "math-fractions",
+      "title": "fraction for school student",
+      "type": "note",
+      "description": "fraction for school student ",
+      "content": "",
+      "url": "https://youtu.be/skPB2-Nb4PU?si=wfuQb1FDg1Zb0lYu",
+      "createdBy": "teacher-demo",
+      "createdAt": "2026-09-23T05:57:58.952Z",
+      "published": true
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz-light",
+      "subjectId": "science",
+      "chapterId": "science-light",
+      "title": "Light — Quick Check",
+      "description": "A short practice quiz.",
+      "questions": [
+        {
+          "id": "q1",
+          "question": "What is reflection of light?",
+          "options": [
+            "Change in direction of light after hitting a surface",
+            "Creation of light",
+            "Stopping all light",
+            "Changing light into sound"
+          ],
+          "answer": 0,
+          "explanation": "Reflection is the change in direction of light when it strikes a surface."
+        },
+        {
+          "id": "q2",
+          "question": "Which surface generally gives a clearer reflection?",
+          "options": [
+            "Rough wall",
+            "Smooth mirror",
+            "Paper",
+            "Cloth"
+          ],
+          "answer": 1,
+          "explanation": "A smooth surface produces a more regular reflection."
+        }
+      ],
+      "published": true,
+      "createdBy": "teacher-demo"
+    },
+    {
+      "id": "quiz-1790144549892-3i9poc",
+      "subjectId": "math",
+      "chapterId": "math-fractions",
+      "title": "maths",
+      "description": "maths made easy",
+      "questions": [
+        {
+          "question": "which of the following is an example of a proper function",
+          "options": [
+            "5/3",
+            "2/3",
+            "6/5",
+            "7/2"
+          ],
+          "answer": 1,
+          "explanation": "Remember, in proper fraction the top number is always smaller than the bottom number"
+        }
+      ],
+      "createdBy": "teacher-demo",
+      "published": true
+    }
+  ],
+  "results": [],
+  "careers": [
+    {
+      "id": "medical-research",
+      "title": "Medical Research",
+      "emoji": "🧬",
+      "category": "Healthcare",
+      "summary": "Study diseases, treatments, medicines and biological systems through research.",
+      "subjects": [
+        "Biology",
+        "Chemistry",
+        "Mathematics"
+      ],
+      "skills": [
+        "Research",
+        "Data analysis",
+        "Problem solving",
+        "Communication"
+      ],
+      "path": "School science → relevant undergraduate study → specialised research/advanced study",
+      "related": [
+        "Biotechnology",
+        "Pharmacy",
+        "Medical Laboratory Science"
+      ]
+    },
+    {
+      "id": "biotech",
+      "title": "Biotechnology",
+      "emoji": "🧫",
+      "category": "Healthcare",
+      "summary": "Use biology and technology to develop useful products, processes and solutions.",
+      "subjects": [
+        "Biology",
+        "Chemistry"
+      ],
+      "skills": [
+        "Laboratory thinking",
+        "Research",
+        "Data analysis"
+      ],
+      "path": "Science in school → biotechnology or related degree → specialised area",
+      "related": [
+        "Medical Research",
+        "Microbiology",
+        "Food Technology"
+      ]
+    },
+    {
+      "id": "data-science",
+      "title": "Data Science",
+      "emoji": "📊",
+      "category": "Technology",
+      "summary": "Use mathematics, statistics and computing to find useful patterns in data.",
+      "subjects": [
+        "Mathematics",
+        "Computer Science"
+      ],
+      "skills": [
+        "Statistics",
+        "Programming",
+        "Critical thinking"
+      ],
+      "path": "Strong mathematics + computing foundation → degree/diploma → projects and specialisation",
+      "related": [
+        "AI/ML",
+        "Business Analytics",
+        "Data Engineering"
+      ]
+    },
+    {
+      "id": "cybersecurity",
+      "title": "Cybersecurity",
+      "emoji": "🛡️",
+      "category": "Technology",
+      "summary": "Help protect systems, networks and information from security threats.",
+      "subjects": [
+        "Mathematics",
+        "Computer Science",
+        "English"
+      ],
+      "skills": [
+        "Logical thinking",
+        "Networking",
+        "Problem solving"
+      ],
+      "path": "Computing foundation → cybersecurity study/certifications → practical projects",
+      "related": [
+        "Networking",
+        "Digital Forensics",
+        "Cloud Security"
+      ]
+    },
+    {
+      "id": "animation-design",
+      "title": "Animation & Digital Design",
+      "emoji": "🎨",
+      "category": "Creative",
+      "summary": "Create visual stories, characters, motion graphics and digital experiences.",
+      "subjects": [
+        "Art",
+        "English",
+        "Computer Science"
+      ],
+      "skills": [
+        "Creativity",
+        "Visual communication",
+        "Storytelling",
+        "Software skills"
+      ],
+      "path": "Build a portfolio → design/animation education or training → specialised work",
+      "related": [
+        "UI/UX Design",
+        "Game Design",
+        "Graphic Design"
+      ]
+    },
+    {
+      "id": "psychology",
+      "title": "Psychology",
+      "emoji": "🧠",
+      "category": "People & Society",
+      "summary": "Study behaviour, thoughts, emotions and how people interact with their environment.",
+      "subjects": [
+        "Biology",
+        "English",
+        "Social Science"
+      ],
+      "skills": [
+        "Communication",
+        "Observation",
+        "Research",
+        "Empathy"
+      ],
+      "path": "Relevant undergraduate study → specialised postgraduate study where required",
+      "related": [
+        "Counselling",
+        "Human Resources",
+        "Research"
+      ]
+    }
+  ]
+}
