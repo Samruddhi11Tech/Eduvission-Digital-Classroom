@@ -7,12 +7,14 @@
       "passwordHash": "$2y$12$kqeJIVFvGcgwI/8LHsTaUeduNPZ16/sqDkjI4TofqZWzkT8zqoseK",
       "role": "teacher"
     },
-    {
-      "id": "student-demo",
-      "name": "Demo Student",
-      "email": "student@eduvision.local",
-      "passwordHash": "$2y$12$WKoKicbVe6JxbmCfTSdAxOoJl/kidi1LNEwNrRbSHkkDNXQqGutaC",
-      "role": "student"
+    {     
+  "id": "student-demo",
+  "name": "Demo Student",
+  "email": "student@eduvision.local",
+  "passwordHash": "...",
+  "role": "student",
+  "className": "",
+  "language": "English"
     }
   ],
   "subjects": [
@@ -79,6 +81,7 @@
       "subjectId": "science",
       "title": "Light Around Us",
       "description": "Reflection, shadows and how we see objects.",
+      "className": "all",
       "published": true
     },
     {
@@ -86,6 +89,7 @@
       "subjectId": "math",
       "title": "Fractions Made Visual",
       "description": "Understand fractions using everyday objects and pictures.",
+      "className": "all",
       "published": true
     },
     {
@@ -93,6 +97,7 @@
       "subjectId": "computer",
       "title": "Introduction to Artificial Intelligence",
       "description": "A friendly introduction to AI and how machines learn patterns.",
+      "className": "all",
       "published": true
     }
   ],
@@ -105,6 +110,8 @@
       "description": "Read the core ideas before attempting the quiz.",
       "content": "Light can change direction when it strikes a surface. This change in direction is called reflection. A smooth surface can produce a clear reflection.",
       "url": "",
+      "className": "all",
+      "language": "English",
       "createdBy": "teacher-demo",
       "createdAt": "2026-09-01T10:00:00.000Z",
       "published": true
@@ -117,6 +124,8 @@
       "description": "Paste a trusted educational video link from the teacher dashboard.",
       "content": "",
       "url": "https://www.youtube.com/watch?v=example",
+      "className": "all",
+      "language": "English",
       "createdBy": "teacher-demo",
       "createdAt": "2026-09-01T10:05:00.000Z",
       "published": true
@@ -129,6 +138,8 @@
       "description": "A beginner friendly python learning playlist",
       "content": "A beginner friendly python learning playlist",
       "url": "https://youtube.com/playlist?list=PLKnIA16_Rmvb1RYR-iTA_hzckhdONtSW4&si=iFUVwQ-i9arYMjEz",
+      "className": "all",
+      "language": "English",
       "createdBy": "teacher-demo",
       "createdAt": "2026-09-22T18:20:02.643Z",
       "published": true
@@ -141,6 +152,8 @@
       "description": "fraction for school student ",
       "content": "",
       "url": "https://youtu.be/skPB2-Nb4PU?si=wfuQb1FDg1Zb0lYu",
+      "className": "all",
+      "language": "English",
       "createdBy": "teacher-demo",
       "createdAt": "2026-09-23T05:57:58.952Z",
       "published": true
