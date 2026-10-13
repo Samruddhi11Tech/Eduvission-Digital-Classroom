@@ -3,6 +3,8 @@ const API = "/api";
 const state = {
   token: localStorage.getItem("edu_token"),
   user: JSON.parse(localStorage.getItem("edu_user") || "null"),
+  className: localStorage.getItem("edu_class") || "",
+  language: localStorage.getItem("edu_language") || "English",
   subjects: [],
   chapters: [],
   materials: [],
@@ -51,6 +53,14 @@ function navbar(){
       <span class="brand-bubble">✨</span> EduVision
     </a>
     <div class="nav-links">
+    <div class="language-selector">
+  <span>🌐</span>
+  <select onchange="changeLanguage(this.value)">
+    <option value="English" ${state.language==="English"?"selected":""}>English</option>
+    <option value="Marathi" ${state.language==="Marathi"?"selected":""}>मराठी</option>
+    <option value="Hindi" ${state.language==="Hindi"?"selected":""}>हिन्दी</option>
+  </select>
+</div>
       <button class="nav-btn" onclick="renderHome()">Home</button>
       <button class="nav-btn" onclick="renderPublicSubjects()">Subjects</button>
       <button class="nav-btn" onclick="renderCareers()">Career Explorer</button>
@@ -62,6 +72,47 @@ function navbar(){
       }
     </div>
   </nav>`;
+}
+async function changeLanguage(language){
+  state.language = language;
+
+  localStorage.setItem("edu_language", language);
+
+  if(state.user?.role === "student"){
+    try{
+      await api("/profile/language",{
+        method:"PATCH",
+        body:JSON.stringify({language})
+      });
+
+      state.user.language = language;
+      localStorage.setItem("edu_user",JSON.stringify(state.user));
+
+      toast(
+        language === "Marathi"
+          ? "भाषा मराठीमध्ये बदलली आहे."
+          : language === "Hindi"
+            ? "भाषा हिन्दी में बदल गई है।"
+            : "Language changed to English."
+      );
+    }catch(err){
+      toast(err.message);
+    }
+  }
+
+  renderCurrentPage();
+}
+function renderCurrentPage(){
+  if(!state.user){
+    renderHome();
+    return;
+  }
+
+  if(state.user.role === "teacher"){
+    renderTeacher();
+  }else{
+    renderStudent();
+  }
 }
 
 function renderHome(){
@@ -183,16 +234,100 @@ async function loadCore(){
   state.subjects=subjects;
   state.careers=careers;
 }
+function renderClassSelection(){
+  app.innerHTML=`
+    ${navbar()}
+
+    <div class="class-selection-page">
+
+      <div class="class-selection-card">
+
+        <div class="class-icon">🎓</div>
+
+        <span class="pill">Welcome to EduVision</span>
+
+        <h1>Select your class</h1>
+
+        <p>
+          Choose your standard so we can show learning materials
+          specially prepared for your class.
+        </p>
+
+        <div class="class-grid">
+
+          ${["5","6","7","8","9","10","11","12"].map(c=>`
+            <button
+              class="class-option"
+              onclick="selectStudentClass('${c}')"
+            >
+              <span>Class</span>
+              <strong>${c}</strong>
+            </button>
+          `).join("")}
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+async function selectStudentClass(className){
+  try{
+    await api("/profile/class",{
+      method:"PATCH",
+      body:JSON.stringify({className})
+    });
+
+    state.className = className;
+    state.user.className = className;
+
+    localStorage.setItem("edu_class",className);
+    localStorage.setItem("edu_user",JSON.stringify(state.user));
+
+    toast(`Class ${className} selected!`);
+
+    renderStudent();
+
+  }catch(err){
+    toast(err.message);
+  }
+}
 
 async function renderStudent(){
   try{
     await loadCore();
+
+    // Load latest student profile
+    try{
+      const profile = await api("/profile");
+
+      state.user = {
+        ...state.user,
+        ...profile
+      };
+
+      state.className = profile.className || "";
+      state.language = profile.language || state.language || "English";
+
+      localStorage.setItem("edu_user",JSON.stringify(state.user));
+      localStorage.setItem("edu_class",state.className);
+      localStorage.setItem("edu_language",state.language);
+    }catch{}
+
+    if(!state.className){
+      renderClassSelection();
+      return;
+    }
     const results=await api("/results/me");
     const avg=results.length ? Math.round(results.reduce((a,b)=>a+b.percentage,0)/results.length) : 0;
     app.innerHTML=dashboardShell("student",`
       <div class="dashboard-header">
         <div><h1>Hi, ${escapeHTML(state.user?.name||"Learner")}! 🌟</h1><p class="section-subtitle">What would you like to discover today?</p></div>
-        <div class="user-chip">🎒 Student</div>
+        <div class="user-chip">
+  🎒 Student · Class ${escapeHTML(state.className)}
+</div>
       </div>
       <div class="stats">
         <div class="stat-card"><div class="num">${state.subjects.length}</div><div class="label">Subjects</div></div>
@@ -476,6 +611,20 @@ async function renderTeacherSubjects(){
         <form onsubmit="addChapter(event)">
           <div class="form-group"><label>Subject</label><select id="chapterSubject">${subjects.map(s=>`<option value="${s.id}">${escapeHTML(s.name)}</option>`).join("")}</select></div>
           <div class="form-group"><label>Chapter title</label><input id="chapterTitle" required></div>
+          <div class="form-group">
+  <label>Class / Standard</label>
+  <select id="chapterClass" required>
+    <option value="5">Class 5</option>
+    <option value="6">Class 6</option>
+    <option value="7">Class 7</option>
+    <option value="8" selected>Class 8</option>
+    <option value="9">Class 9</option>
+    <option value="10">Class 10</option>
+    <option value="11">Class 11</option>
+    <option value="12">Class 12</option>
+    <option value="all">All Classes</option>
+  </select>
+</div>
           <div class="form-group"><label>Description</label><textarea id="chapterDescription" required></textarea></div>
           <button class="primary-btn">Publish chapter</button>
         </form>
@@ -497,9 +646,15 @@ async function addSubject(e){
 async function addChapter(e){
   e.preventDefault();
   try{
-    await api("/chapters",{method:"POST",body:JSON.stringify({
-      subjectId:chapterSubject.value,title:chapterTitle.value,description:chapterDescription.value
-    })});
+    await api("/chapters",{
+  method:"POST",
+  body:JSON.stringify({
+    subjectId:chapterSubject.value,
+    title:chapterTitle.value,
+    description:chapterDescription.value,
+    className:chapterClass.value
+  })
+});
     toast("Chapter published!");
     renderTeacherSubjects();
   }catch(err){toast(err.message)}
@@ -517,6 +672,30 @@ async function renderTeacherMaterials(){
             <div class="form-group"><label>Chapter</label><select id="materialChapter" required>${allChapters.map(c=>`<option value="${c.id}">${escapeHTML(c.title)}</option>`).join("")}</select></div>
             <div class="form-group"><label>Title</label><input id="materialTitle" required placeholder="e.g. Reflection of Light Notes"></div>
             <div class="form-group"><label>Type</label><select id="materialType"><option value="note">Notes</option><option value="video">Video</option><option value="image">Image</option><option value="pdf">PDF / File</option><option value="link">Resource Link</option></select></div>
+           <div class="form-group">
+  <label>Class / Standard</label>
+  <select id="materialClass" required>
+    <option value="5">Class 5</option>
+    <option value="6">Class 6</option>
+    <option value="7">Class 7</option>
+    <option value="8" selected>Class 8</option>
+    <option value="9">Class 9</option>
+    <option value="10">Class 10</option>
+    <option value="11">Class 11</option>
+    <option value="12">Class 12</option>
+    <option value="all">All Classes</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label>Material Language</label>
+  <select id="materialLanguage" required>
+    <option value="English">English</option>
+    <option value="Marathi">मराठी</option>
+    <option value="Hindi">हिन्दी</option>
+    <option value="all">All Languages</option>
+  </select>
+</div>
             <div class="form-group"><label>Description</label><textarea id="materialDescription" required></textarea></div>
           </div>
           <div>
@@ -540,6 +719,8 @@ async function publishMaterial(e){
   fd.append("description",materialDescription.value);
   fd.append("content",materialContent.value);
   fd.append("url",materialUrl.value);
+  fd.append("className",materialClass.value);
+  fd.append("language",materialLanguage.value);
   if(materialFile.files[0]) fd.append("file",materialFile.files[0]);
   try{await api("/materials",{method:"POST",body:fd});toast("Published to students!");renderTeacherMaterials()}
   catch(err){toast(err.message)}
