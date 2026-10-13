@@ -89,10 +89,92 @@ app.post("/api/auth/login", async (req,res) => {
   if(!ok) return res.status(401).json({ message:"Invalid email or password." });
   res.json({
     token:signUser(user),
-    user:{id:user.id,name:user.name,email:user.email,role:user.role}
+    user:{
+      id:user.id,
+      name:user.name,
+      email:user.email,
+      role:user.role,
+      className:user.className || ""
+    }
+  });
+});
+// ---------------- Student Class ----------------
+
+app.get("/api/profile", auth, (req,res)=>{
+  const data = db();
+  const user = data.users.find(u => u.id === req.user.id);
+
+  if(!user) return res.status(404).json({message:"User not found."});
+
+  res.json({
+    id:user.id,
+    name:user.name,
+    email:user.email,
+    role:user.role,
+    className:user.className || ""
   });
 });
 
+app.patch("/api/profile/class", auth, role("student"), (req,res)=>{
+  const { className } = req.body;
+
+  const allowedClasses = [
+    "5","6","7","8","9","10","11","12"
+  ];
+
+  if(!allowedClasses.includes(String(className))){
+    return res.status(400).json({
+      message:"Please select a valid class."
+    });
+  }
+
+  const data = db();
+  const user = data.users.find(u => u.id === req.user.id);
+
+  if(!user){
+    return res.status(404).json({message:"User not found."});
+  }
+
+  user.className = String(className);
+
+  saveDB(data);
+
+  res.json({
+    message:"Class saved successfully.",
+    className:user.className
+  });
+});
+app.patch("/api/profile/language", auth, role("student"), (req,res)=>{
+  const { language } = req.body;
+
+  const allowedLanguages = [
+    "English",
+    "Marathi",
+    "Hindi"
+  ];
+
+  if(!allowedLanguages.includes(language)){
+    return res.status(400).json({
+      message:"Please select a valid language."
+    });
+  }
+
+  const data = db();
+  const user = data.users.find(u => u.id === req.user.id);
+
+  if(!user){
+    return res.status(404).json({message:"User not found."});
+  }
+
+  user.language = language;
+
+  saveDB(data);
+
+  res.json({
+    message:"Language saved successfully.",
+    language:user.language
+  });
+});
 app.get("/api/subjects", (req,res)=>res.json(db().subjects));
 app.get("/api/subjects/:id", (req,res)=>{
   const data=db(); const subject=data.subjects.find(s=>s.id===req.params.id);
@@ -100,8 +182,37 @@ app.get("/api/subjects/:id", (req,res)=>{
   res.json({subject});
 });
 app.get("/api/subjects/:id/chapters",(req,res)=>{
-  res.json(db().chapters.filter(c=>c.subjectId===req.params.id && c.published!==false));
+  const data = db();
+
+  let chapters = data.chapters.filter(
+    c => c.subjectId === req.params.id && c.published !== false
+  );
+
+  // Students see their own class + "all" content.
+  if(req.headers.authorization){
+    try{
+      const token = req.headers.authorization.startsWith("Bearer ")
+        ? req.headers.authorization.slice(7)
+        : null;
+
+      if(token){
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = data.users.find(u => u.id === decoded.id);
+
+        if(user?.role === "student" && user.className){
+          chapters = chapters.filter(
+            c => !c.className ||
+                 c.className === "all" ||
+                 c.className === user.className
+          );
+        }
+      }
+    }catch{}
+  }
+
+  res.json(chapters);
 });
+
 app.post("/api/subjects", auth, role("teacher"), (req,res)=>{
   const {name,emoji,description,color}=req.body;
   if(!name) return res.status(400).json({message:"Subject name is required."});
@@ -109,34 +220,100 @@ app.post("/api/subjects", auth, role("teacher"), (req,res)=>{
   const subject={id:id("subject"),name,emoji:emoji||"📚",description:description||"",color:color||"purple"};
   data.subjects.push(subject); saveDB(data); res.status(201).json(subject);
 });
+
 app.post("/api/chapters", auth, role("teacher"), (req,res)=>{
-  const {subjectId,title,description}=req.body; const data=db();
+  const {subjectId,title,description,className}=req.body;
+  const data=db();
   if(!data.subjects.some(s=>s.id===subjectId)) return res.status(400).json({message:"Subject not found."});
-  if(!title) return res.status(400).json({message:"Chapter title is required."});
-  const chapter={id:id("chapter"),subjectId,title,description:description||"",published:true};
+  if(!title) return res.status(400).json({message:"Chapter title is required."});const chapter={
+  id:id("chapter"),
+  subjectId,
+  title,
+  description:description||"",
+  className:className || "all",
+  published:true
+};
   data.chapters.push(chapter); saveDB(data); res.status(201).json(chapter);
 });
 
 app.get("/api/chapters/:id",(req,res)=>{
   const data=db();
-  const chapter=data.chapters.find(c=>c.id===req.params.id && c.published!==false);
-  if(!chapter) return res.status(404).json({message:"Chapter not found."});
-  const materials=data.materials.filter(m=>m.chapterId===chapter.id && m.published!==false);
-  const quizzes=data.quizzes.filter(q=>q.chapterId===chapter.id && q.published!==false).map(q=>({
-    id:q.id,title:q.title,description:q.description,subjectId:q.subjectId,chapterId:q.chapterId
-  }));
+
+  const chapter=data.chapters.find(
+    c => c.id===req.params.id && c.published!==false
+  );
+
+  if(!chapter)
+    return res.status(404).json({message:"Chapter not found."});
+
+  let student = null;
+
+  // Read logged-in student if a token exists
+  try{
+    const header = req.headers.authorization || "";
+    const token = header.startsWith("Bearer ")
+      ? header.slice(7)
+      : null;
+
+    if(token){
+      const decoded = jwt.verify(token, JWT_SECRET);
+      student = data.users.find(u => u.id === decoded.id);
+    }
+  }catch{}
+
+  let materials=data.materials.filter(
+    m => m.chapterId===chapter.id && m.published!==false
+  );
+
+  if(student?.role === "student"){
+    materials = materials.filter(m =>
+      (!m.className || m.className === "all" || m.className === student.className) &&
+      (!m.language || m.language === student.language || m.language === "all")
+    );
+  }
+
+  const quizzes=data.quizzes
+    .filter(q=>q.chapterId===chapter.id && q.published!==false)
+    .map(q=>({
+      id:q.id,
+      title:q.title,
+      description:q.description,
+      subjectId:q.subjectId,
+      chapterId:q.chapterId
+    }));
+
   res.json({chapter,materials,quizzes});
 });
 
 app.post("/api/materials", auth, role("teacher"), upload.single("file"), (req,res)=>{
-  const {chapterId,title,type,description,content,url}=req.body; const data=db();
+  const {
+    chapterId,
+    title,
+    type,
+    description,
+    content,
+    url,
+    className,
+    language
+  } = req.body;
+
+  const data=db();
   if(!data.chapters.some(c=>c.id===chapterId)) return res.status(400).json({message:"Chapter not found."});
   if(!title) return res.status(400).json({message:"Material title is required."});
   const material={
-    id:id("material"),chapterId,title,type:type||"note",description:description||"",
-    content:content||"",url:url||"",createdBy:req.user.id,createdAt:new Date().toISOString(),
-    published:true
-  };
+  id:id("material"),
+  chapterId,
+  title,
+  type:type||"note",
+  description:description||"",
+  content:content||"",
+  url:url||"",
+  className:className || "all",
+  language:language || "English",
+  createdBy:req.user.id,
+  createdAt:new Date().toISOString(),
+  published:true
+};
   if(req.file) material.url=`/uploads/${req.file.filename}`;
   data.materials.push(material); saveDB(data);
   res.status(201).json(material);
